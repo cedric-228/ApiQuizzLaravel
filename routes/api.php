@@ -12,3 +12,6 @@ Route::apiResource('themes', App\Http\Controllers\Api\ThemeController::class);
 Route::apiResource('questions', App\Http\Controllers\Api\QuestionController::class);
 // Réponses
 Route::apiResource('answers', App\Http\Controllers\Api\AnswerController::class);
+
+// Score utilisateur
+Route::get('users/{user}/score', [App\Http\Controllers\Api\AnswerController::class, 'score']);

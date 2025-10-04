@@ -12,7 +12,35 @@ class AnswerController extends Controller
      */
     public function index()
     {
-    return \App\Models\Answer::all();
+        $userId = request()->query('user_id');
+        $query = \App\Models\Answer::query();
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+        return $query->get();
+    }
+
+    /**
+     * Calculer le score total d'un utilisateur
+     */
+    public function score(Request $request, $userId)
+    {
+        $answers = \App\Models\Answer::where('user_id', $userId)->get();
+        $score = 0;
+        foreach ($answers as $answer) {
+            $question = \App\Models\Question::find($answer->question_id);
+            if ($question && $answer->selected_option === $question->correct_option_index) {
+                // Récupérer le thème, puis la phase pour le pointValue
+                $theme = \App\Models\Theme::find($question->theme_id);
+                if ($theme) {
+                    $phase = \App\Models\Phase::find($theme->phase_id);
+                    if ($phase) {
+                        $score += $phase->point_value;
+                    }
+                }
+            }
+        }
+        return response()->json(['user_id' => $userId, 'score' => $score]);
     }
 
     /**
